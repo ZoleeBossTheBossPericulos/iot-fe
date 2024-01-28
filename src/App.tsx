@@ -1,4 +1,3 @@
-import { getDocs, collection } from "firebase/firestore";
 import { ref, get } from "firebase/database";
 import { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
@@ -74,8 +73,35 @@ function App() {
     },
   };
 
+  function timeConverter(UNIX_timestamp: number) {
+    var a = new Date(UNIX_timestamp * 1000);
+    var months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    var year = a.getFullYear();
+    var month = months[a.getMonth()];
+    var date = a.getDate();
+    var hour = a.getHours();
+    var min = a.getMinutes();
+    var sec = a.getSeconds();
+    var time =
+      date + " " + month + " " + year + " " + hour + ":" + min + ":" + sec;
+    return time;
+  }
+
   const humidity = {
-    labels: data.map((d) => d.timestamp),
+    labels: data.map((d) => timeConverter(d.timestamp)),
     datasets: [
       {
         label: "Humidity",
@@ -87,7 +113,7 @@ function App() {
   };
 
   const temperature = {
-    labels: data.map((d) => d.timestamp),
+    labels: data.map((d) => timeConverter(d.timestamp)),
     datasets: [
       {
         label: "Temperature",
@@ -99,7 +125,7 @@ function App() {
   };
 
   const lux = {
-    labels: data.map((d) => d.timestamp),
+    labels: data.map((d) => timeConverter(d.timestamp)),
     datasets: [
       {
         label: "Lux",
