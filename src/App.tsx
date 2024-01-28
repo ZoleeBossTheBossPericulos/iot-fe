@@ -122,7 +122,7 @@ function App() {
       <br />
       <br />
       <br />
-      <h1>Lux chart</h1>
+      <h1>Brightness chart</h1>
       <Line options={options} data={lux} />
       <br />
       <br />
