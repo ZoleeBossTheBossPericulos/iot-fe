@@ -1,4 +1,5 @@
 import { getDocs, collection } from "firebase/firestore";
+import { ref, get } from "firebase/database";
 import { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import "./App.css";
@@ -18,7 +19,7 @@ interface DataProps {
   hum: number;
   lux: number;
   temp: number;
-  id: string;
+  timestamp: number;
 }
 
 function App() {
@@ -34,24 +35,29 @@ function App() {
     Legend
   );
 
-  const fetchData = async () => {
-    const querySnapshot = await getDocs(collection(db, "data"));
-    const newData = querySnapshot.docs.map(
-      (doc) =>
-        ({
-          ...doc.data(),
-          id: doc.id,
-        } as any)
-    );
-    setData(newData);
+  const fetch = async () => {
+    const dbRef = ref(db, "data");
+    get(dbRef)
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          const value = snapshot.val();
+          setData(Object.values(value));
+          return;
+        }
+
+        console.log("No data available");
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   useEffect(() => {
     const fetchDataWithInterval = async () => {
-      await fetchData();
+      await fetch();
 
       const intervalId = setInterval(async () => {
-        await fetchData();
+        await fetch();
       }, 5000);
 
       return () => clearInterval(intervalId);
@@ -69,7 +75,7 @@ function App() {
   };
 
   const humidity = {
-    labels: data.map((d) => d.id),
+    labels: data.map((d) => d.timestamp),
     datasets: [
       {
         label: "Humidity",
@@ -81,7 +87,7 @@ function App() {
   };
 
   const temperature = {
-    labels: data.map((d) => d.id),
+    labels: data.map((d) => d.timestamp),
     datasets: [
       {
         label: "Temperature",
@@ -93,7 +99,7 @@ function App() {
   };
 
   const lux = {
-    labels: data.map((d) => d.id),
+    labels: data.map((d) => d.timestamp),
     datasets: [
       {
         label: "Lux",
